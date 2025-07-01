@@ -3,6 +3,7 @@ using HuynhNgocTien_SE18B01_A02.Repositories;
 using HuynhNgocTien_SE18B01_A02.Repositories.Implement;
 using HuynhNgocTien_SE18B01_A02.Services;
 using HuynhNgocTien_SE18B01_A02.Services.Implement;
+using HuynhNgocTien_SE18B01_A02.Hubs;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,6 +16,9 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
+
+// Add SignalR
+builder.Services.AddSignalR();
 // Configure DbContext
 builder.Services.AddDbContext<FunewsManagementContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -29,6 +33,7 @@ builder.Services.AddScoped<ITagRepository, TagRepository>();
 builder.Services.AddScoped<ISystemAccountService, SystemAccountService>();
 builder.Services.AddScoped<INewsArticleService, NewsArticleService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<ISignalRNotificationService, SignalRNotificationService>();
 
 // Register DbInitializer
 builder.Services.AddScoped<DbInitializer>();
@@ -106,5 +111,10 @@ app.UseSession();
 app.UseAuthorization();
 
 app.MapRazorPages();
+
+// Map SignalR Hubs
+app.MapHub<NewsArticleHub>("/newsArticleHub");
+app.MapHub<CategoryHub>("/categoryHub");
+app.MapHub<SystemAccountHub>("/systemAccountHub");
 
 app.Run();

@@ -1,15 +1,20 @@
 using HuynhNgocTien_SE18B01_A02.Models;
 using HuynhNgocTien_SE18B01_A02.Repositories;
+using HuynhNgocTien_SE18B01_A02.Hubs;
+using HuynhNgocTien_SE18B01_A02.Extensions;
+using Microsoft.AspNetCore.SignalR;
 
 namespace HuynhNgocTien_SE18B01_A02.Services.Implement;
 
 public class SystemAccountService : ISystemAccountService
 {
     private readonly ISystemAccountRepository _accountRepository;
+    private readonly IHubContext<SystemAccountHub> _hubContext;
 
-    public SystemAccountService(ISystemAccountRepository accountRepository)
+    public SystemAccountService(ISystemAccountRepository accountRepository, IHubContext<SystemAccountHub> hubContext)
     {
         _accountRepository = accountRepository;
+        _hubContext = hubContext;
     }
 
     public async Task<SystemAccount?> GetByIdAsync(short id)
@@ -34,7 +39,21 @@ public class SystemAccountService : ISystemAccountService
             throw new InvalidOperationException("Email already exists");
         }
 
-        return await _accountRepository.AddAsync(account);
+        var createdAccount = await _accountRepository.AddAsync(account);
+
+        // Send SignalR notification
+        try
+        {
+            var accountDto = createdAccount.ToDto();
+            await _hubContext.Clients.Group("SystemAccounts").SendAsync("AccountCreated", accountDto);
+        }
+        catch (Exception ex)
+        {
+            // Log error but don't fail the operation
+            Console.WriteLine($"SignalR notification failed: {ex.Message}");
+        }
+
+        return createdAccount;
     }
 
     public async Task<SystemAccount> UpdateAsync(SystemAccount account)
@@ -52,7 +71,22 @@ public class SystemAccountService : ISystemAccountService
             throw new InvalidOperationException("Email already exists");
         }
 
-        return await _accountRepository.UpdateAsync(account);
+        var updatedAccount = await _accountRepository.UpdateAsync(account);
+
+        // Send SignalR notification
+        try
+        {
+            var accountDto = updatedAccount.ToDto();
+            await _hubContext.Clients.Group("SystemAccounts").SendAsync("AccountUpdated", accountDto);
+            await _hubContext.Clients.Group($"User_{accountDto.AccountId}").SendAsync("ProfileUpdated", accountDto);
+        }
+        catch (Exception ex)
+        {
+            // Log error but don't fail the operation
+            Console.WriteLine($"SignalR notification failed: {ex.Message}");
+        }
+
+        return updatedAccount;
     }
 
     public async Task DeleteAsync(short id)
@@ -63,6 +97,18 @@ public class SystemAccountService : ISystemAccountService
         }
 
         await _accountRepository.DeleteAsync(id);
+
+        // Send SignalR notification
+        try
+        {
+            await _hubContext.Clients.Group("SystemAccounts").SendAsync("AccountDeleted", id);
+            await _hubContext.Clients.Group($"User_{id}").SendAsync("ForceLogout", "Your account has been deleted.");
+        }
+        catch (Exception ex)
+        {
+            // Log error but don't fail the operation
+            Console.WriteLine($"SignalR notification failed: {ex.Message}");
+        }
     }
 
     public async Task<bool> ValidateLoginAsync(string email, string password)

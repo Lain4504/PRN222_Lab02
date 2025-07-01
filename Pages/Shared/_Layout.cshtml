@@ -45,6 +45,11 @@
                                         <i class="bi bi-graph-up"></i> Report
                                     </a>
                                 </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-page="/Test/SignalRTest">
+                                        <i class="bi bi-broadcast"></i> SignalR Test
+                                    </a>
+                                </li>
                             }
                         }
                     </ul>
@@ -103,6 +108,17 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @* SignalR Scripts - Only load if user is authenticated *@
+    @if (Context.Session.GetInt32("AccountId").HasValue)
+    {
+        <script src="https://unpkg.com/@@microsoft/signalr@latest/dist/browser/signalr.min.js"></script>
+        <script src="~/js/signalr-client.js" asp-append-version="true"></script>
+        <script src="~/js/newsarticle-realtime.js" asp-append-version="true"></script>
+        <script src="~/js/category-realtime.js" asp-append-version="true"></script>
+        <script src="~/js/account-realtime.js" asp-append-version="true"></script>
+    }
+
     @if (IsSectionDefined("Scripts"))
     {
         @RenderSection("Scripts", required: false)

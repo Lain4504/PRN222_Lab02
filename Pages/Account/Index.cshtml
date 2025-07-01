@@ -16,19 +16,20 @@
         @if (Model.Accounts.Any())
         {
             <div class="table-responsive">
-                <table class="table table-hover">
+                <table id="accountsTable" class="table table-hover">
                     <thead>
                         <tr>
                             <th>Name</th>
                             <th>Email</th>
                             <th>Role</th>
+                            <th>Status</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach (var item in Model.Accounts)
                         {
-                            <tr>
+                            <tr data-account-id="@item.AccountId">
                                 <td>@item.AccountName</td>
                                 <td>@item.AccountEmail</td>
                                 <td>
@@ -47,6 +48,9 @@
                                             <span class="badge bg-secondary">Unknown</span>
                                             break;
                                     }
+                                </td>
+                                <td class="online-status">
+                                    <span class="badge bg-secondary">Offline</span>
                                 </td>
                                 <td>
                                     <div class="btn-group">
@@ -98,5 +102,10 @@
                 form.submit();
             }
         }
+
+        // Delete function for real-time updates
+        function deleteAccount(accountId) {
+            confirmDelete(accountId);
+        }
     </script>
-} 
+}

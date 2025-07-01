@@ -1,6 +1,9 @@
 using HuynhNgocTien_SE18B01_A02.Models;
 using HuynhNgocTien_SE18B01_A02.Repositories;
 using HuynhNgocTien_SE18B01_A02.Services;
+using HuynhNgocTien_SE18B01_A02.Hubs;
+using HuynhNgocTien_SE18B01_A02.Extensions;
+using Microsoft.AspNetCore.SignalR;
 
 namespace HuynhNgocTien_SE18B01_A02.Services.Implement;
 
@@ -8,11 +11,13 @@ public class CategoryService : ICategoryService
 {
     private readonly ICategoryRepository _categoryRepository;
     private readonly INewsArticleRepository _newsRepository;
+    private readonly IHubContext<CategoryHub> _hubContext;
 
-    public CategoryService(ICategoryRepository categoryRepository, INewsArticleRepository newsRepository)
+    public CategoryService(ICategoryRepository categoryRepository, INewsArticleRepository newsRepository, IHubContext<CategoryHub> hubContext)
     {
         _categoryRepository = categoryRepository;
         _newsRepository = newsRepository;
+        _hubContext = hubContext;
     }
 
     public async Task<Category?> GetByIdAsync(short id)
@@ -47,7 +52,22 @@ public class CategoryService : ICategoryService
             }
         }
 
-        return await _categoryRepository.AddAsync(category);
+        var createdCategory = await _categoryRepository.AddAsync(category);
+
+        // Send SignalR notification
+        try
+        {
+            var categoryDto = createdCategory.ToDto();
+            await _hubContext.Clients.Group("Categories").SendAsync("CategoryCreated", categoryDto);
+            await _hubContext.Clients.All.SendAsync("CategoryListUpdated");
+        }
+        catch (Exception ex)
+        {
+            // Log error but don't fail the operation
+            Console.WriteLine($"SignalR notification failed: {ex.Message}");
+        }
+
+        return createdCategory;
     }
 
     public async Task<Category> UpdateAsync(Category category)
@@ -73,7 +93,22 @@ public class CategoryService : ICategoryService
             }
         }
 
-        return await _categoryRepository.UpdateAsync(category);
+        var updatedCategory = await _categoryRepository.UpdateAsync(category);
+
+        // Send SignalR notification
+        try
+        {
+            var categoryDto = updatedCategory.ToDto();
+            await _hubContext.Clients.Group("Categories").SendAsync("CategoryUpdated", categoryDto);
+            await _hubContext.Clients.All.SendAsync("CategoryListUpdated");
+        }
+        catch (Exception ex)
+        {
+            // Log error but don't fail the operation
+            Console.WriteLine($"SignalR notification failed: {ex.Message}");
+        }
+
+        return updatedCategory;
     }
 
     public async Task DeleteAsync(short id)
@@ -96,6 +131,18 @@ public class CategoryService : ICategoryService
         }
 
         await _categoryRepository.DeleteAsync(id);
+
+        // Send SignalR notification
+        try
+        {
+            await _hubContext.Clients.Group("Categories").SendAsync("CategoryDeleted", id);
+            await _hubContext.Clients.All.SendAsync("CategoryListUpdated");
+        }
+        catch (Exception ex)
+        {
+            // Log error but don't fail the operation
+            Console.WriteLine($"SignalR notification failed: {ex.Message}");
+        }
     }
 
     public async Task<IEnumerable<Category>> SearchAsync(string searchTerm)

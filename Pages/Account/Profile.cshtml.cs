@@ -9,10 +9,12 @@ namespace HuynhNgocTien_SE18B01_A02.Pages.Account
     public class ProfileModel : PageModel
     {
         private readonly ISystemAccountService _accountService;
+        private readonly ISignalRNotificationService _signalRService;
 
-        public ProfileModel(ISystemAccountService accountService)
+        public ProfileModel(ISystemAccountService accountService, ISignalRNotificationService signalRService)
         {
             _accountService = accountService;
+            _signalRService = signalRService;
         }
 
         [BindProperty]
@@ -79,8 +81,25 @@ namespace HuynhNgocTien_SE18B01_A02.Pages.Account
             return RedirectToPage();
         }
 
-        public IActionResult OnPostLogout()
+        public async Task<IActionResult> OnPostLogoutAsync()
         {
+            var accountId = HttpContext.Session.GetInt32("AccountId");
+            var accountName = HttpContext.Session.GetString("AccountName");
+
+            // Send SignalR notification for user logout
+            if (accountId.HasValue)
+            {
+                try
+                {
+                    await _signalRService.NotifyUserLogoutAsync((short)accountId.Value, accountName ?? "Unknown");
+                }
+                catch (Exception ex)
+                {
+                    // Log error but don't fail logout
+                    Console.WriteLine($"SignalR logout notification failed: {ex.Message}");
+                }
+            }
+
             HttpContext.Session.Clear();
             return RedirectToPage("/Account/Login");
         }

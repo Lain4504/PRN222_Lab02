@@ -42,7 +42,7 @@
         @if (Model.Articles.Any())
         {
             <div class="table-responsive">
-                <table class="table table-hover">
+                <table id="articlesTable" class="table table-hover">
                     <thead>
                         <tr>
                             <th>Title</th>
@@ -56,10 +56,10 @@
                     <tbody>
                         @foreach (var item in Model.Articles)
                         {
-                            <tr>
+                            <tr data-article-id="@item.NewsArticleId">
                                 <td>@item.NewsTitle</td>
                                 <td>@item.Category?.CategoryName</td>
-                                <td>
+                                <td class="status-cell">
                                     @if ((bool)item.NewsStatus!)
                                     {
                                         <span class="badge bg-success">Published</span>
@@ -157,5 +157,10 @@
             document.body.appendChild(form);
             form.submit();
         });
+
+        // Delete function for real-time updates
+        function deleteArticle(articleId) {
+            confirmDelete(articleId, 'this article');
+        }
     </script>
-} 
+}

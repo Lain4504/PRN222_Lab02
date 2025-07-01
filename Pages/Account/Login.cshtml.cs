@@ -8,10 +8,12 @@ namespace HuynhNgocTien_SE18B01_A02.Pages.Account
     public class LoginModel : PageModel
     {
         private readonly ISystemAccountService _accountService;
+        private readonly ISignalRNotificationService _signalRService;
 
-        public LoginModel(ISystemAccountService accountService)
+        public LoginModel(ISystemAccountService accountService, ISignalRNotificationService signalRService)
         {
             _accountService = accountService;
+            _signalRService = signalRService;
         }
 
         [BindProperty]
@@ -45,6 +47,17 @@ namespace HuynhNgocTien_SE18B01_A02.Pages.Account
             HttpContext.Session.SetInt32("AccountId", account.AccountId);
             HttpContext.Session.SetString("AccountName", account.AccountName ?? "");
             HttpContext.Session.SetInt32("AccountRole", account.AccountRole ?? 0);
+
+            // Send SignalR notification for user login
+            try
+            {
+                await _signalRService.NotifyUserLoginAsync(account.AccountId, account.AccountName ?? "Unknown");
+            }
+            catch (Exception ex)
+            {
+                // Log error but don't fail login
+                Console.WriteLine($"SignalR login notification failed: {ex.Message}");
+            }
 
             return RedirectToPage("/Home/Index");
         }
