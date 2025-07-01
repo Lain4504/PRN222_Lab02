@@ -1,0 +1,40 @@
+@page
+@model HuynhNgocTien_SE18B01_A02.Pages.NewsArticle.PublicDetailsModel
+
+@{
+    ViewData["Title"] = Model.Article.NewsTitle;
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-body">
+                    <h1 class="card-title">@Model.Article.NewsTitle</h1>
+                    <h6 class="card-subtitle mb-3 text-muted">@Model.Article.Headline</h6>
+
+                    <div class="mb-3">
+                        <small class="text-muted">
+                            Published on: @Model.Article.CreatedDate?.ToString("dd/MM/yyyy HH:mm")
+                        </small>
+                    </div>
+
+                    <div class="card-text">
+                        @Model.Article.NewsContent
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(Model.Article.NewsSource))
+                    {
+                        <div class="mt-3">
+                            <small class="text-muted">Source: @Model.Article.NewsSource</small>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <a asp-page="./PublicView" class="btn btn-secondary">Back to News List</a>
+            </div>
+        </div>
+    </div>
+</div> 

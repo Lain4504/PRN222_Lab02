@@ -1,0 +1,64 @@
+@page
+@model HuynhNgocTien_SE18B01_A02.Pages.Category.CreateModel
+
+@{
+    ViewData["Title"] = "Create Category";
+}
+
+<div class="card shadow">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Create New Category</h5>
+        <a asp-page="./Index" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back to List
+        </a>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="mb-3">
+                        <label asp-for="CategoryData.CategoryName" class="form-label"></label>
+                        <input asp-for="CategoryData.CategoryName" class="form-control" />
+                        <span asp-validation-for="CategoryData.CategoryName" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="CategoryData.CategoryDesciption" class="form-label"></label>
+                        <textarea asp-for="CategoryData.CategoryDesciption" class="form-control" rows="3"></textarea>
+                        <span asp-validation-for="CategoryData.CategoryDesciption" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label asp-for="CategoryData.ParentCategoryId" class="form-label">Parent Category</label>
+                        <select asp-for="CategoryData.ParentCategoryId" asp-items="Model.ParentCategories"
+                                class="form-select">
+                            <option value="">None (Root Category)</option>
+                        </select>
+                        <span asp-validation-for="CategoryData.ParentCategoryId" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input asp-for="CategoryData.IsActive" class="form-check-input" type="checkbox" />
+                            <label asp-for="CategoryData.IsActive" class="form-check-label">Active</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-save"></i> Create
+                </button>
+                <a asp-page="./Index" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>

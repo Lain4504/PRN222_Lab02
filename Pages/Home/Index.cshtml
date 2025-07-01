@@ -1,0 +1,98 @@
+﻿@page
+@model HuynhNgocTien_SE18B01_A02.Pages.Home.IndexModel
+
+@{
+    ViewData["Title"] = "Home";
+}
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card shadow mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Latest News Articles</h5>
+            </div>
+            <div class="card-body">
+                @if (Model.RecentArticles.Any())
+                {
+                    <div class="list-group">
+                        @foreach (var article in Model.RecentArticles)
+                        {
+                            <a asp-page="/NewsArticle/Details" asp-route-id="@article.NewsArticleId"
+                               class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">@article.NewsTitle</h6>
+                                    <small class="text-muted">@article.CreatedDate?.ToString("MM/dd/yyyy")</small>
+                                </div>
+                                <p class="mb-1">@article.Headline</p>
+                                <small class="text-muted">
+                                    Category: @article.Category?.CategoryName
+                                    @if (article.NewsStatus == true)
+                                    {
+                                        <span class="badge bg-success ms-2">Published</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning ms-2">Draft</span>
+                                    }
+                                </small>
+                            </a>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted">No articles found.</p>
+                }
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card shadow mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Categories</h5>
+            </div>
+            <div class="card-body">
+                @if (ViewBag.CategoryStats != null && ViewBag.CategoryStats.Count > 0)
+                {
+                    <div class="list-group">
+                        @foreach (var stat in ViewBag.CategoryStats)
+                        {
+                            <div class="list-group-item">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">@stat.Category.CategoryName</h6>
+                                    <span class="badge bg-primary rounded-pill">@stat.ArticleCount</span>
+                                </div>
+                                <small class="text-muted">@stat.Category.CategoryDesciption</small>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted">No categories found.</p>
+                }
+            </div>
+        </div>
+
+        @if (Model.UserRole == 1 || Model.UserRole == 3)
+        {
+            <div class="card shadow">
+                <div class="card-body">
+                    <h5 class="card-title">Quick Actions</h5>
+                    <div class="d-grid gap-2">
+                        <a asp-page="/NewsArticle/Create" class="btn btn-primary">
+                            <i class="bi bi-plus-circle"></i> Create New Article
+                        </a>
+                        @if (Model.UserRole == 3)
+                        {
+                            <a asp-page="/Category/Create" class="btn btn-outline-primary">
+                                <i class="bi bi-folder-plus"></i> Create New Category
+                            </a>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

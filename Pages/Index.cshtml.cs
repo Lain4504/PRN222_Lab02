@@ -12,9 +12,16 @@ namespace HuynhNgocTien_SE18B01_A02.Pages
             _logger = logger;
         }
 
-        public void OnGet()
+        public IActionResult OnGet()
         {
+            // Check if user is already logged in
+            if (HttpContext.Session.GetInt32("AccountId").HasValue)
+            {
+                return RedirectToPage("/Home/Index");
+            }
 
+            // If not logged in, redirect to Login page
+            return RedirectToPage("/Account/Login");
         }
     }
 }

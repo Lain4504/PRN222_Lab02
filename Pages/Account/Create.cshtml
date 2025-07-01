@@ -1,0 +1,53 @@
+@page
+@model HuynhNgocTien_SE18B01_A02.Pages.Account.CreateModel
+
+@{
+    ViewData["Title"] = "Create Account";
+}
+
+<div class="card shadow">
+    <div class="card-header">
+        <h5 class="mb-0">Create New Account</h5>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="mb-3">
+                <label asp-for="AccountData.AccountName" class="form-label"></label>
+                <input asp-for="AccountData.AccountName" class="form-control" />
+                <span asp-validation-for="AccountData.AccountName" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="AccountData.AccountEmail" class="form-label"></label>
+                <input asp-for="AccountData.AccountEmail" class="form-control" />
+                <span asp-validation-for="AccountData.AccountEmail" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="AccountData.AccountPassword" class="form-label"></label>
+                <input asp-for="AccountData.AccountPassword" class="form-control" type="password" />
+                <span asp-validation-for="AccountData.AccountPassword" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="AccountData.AccountRole" class="form-label"></label>
+                <select asp-for="AccountData.AccountRole" class="form-select">
+                    <option value="1">Staff</option>
+                    <option value="2">Lecturer</option>
+                    <option value="3">Admin</option>
+                </select>
+                <span asp-validation-for="AccountData.AccountRole" class="text-danger"></span>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Create</button>
+                <a asp-page="./Index" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>

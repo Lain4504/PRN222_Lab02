@@ -89,6 +89,12 @@ public class CategoryService : ICategoryService
             throw new InvalidOperationException("Cannot delete category that has news articles");
         }
 
+        // Check if category has any subcategories
+        if (await _categoryRepository.HasSubCategoriesAsync(id))
+        {
+            throw new InvalidOperationException("Cannot delete category that has subcategories");
+        }
+
         await _categoryRepository.DeleteAsync(id);
     }
 
