@@ -26,13 +26,13 @@ namespace HuynhNgocTien_SE18B01_A02.Pages.NewsArticle
 
         // Properties that the view expects directly on the model
         [BindProperty]
-        public bool? NewsStatus { get; set; } = true;
+        public bool NewsStatus { get; set; } = true;
 
         public async Task<IActionResult> OnGetAsync()
         {
-            // Check if user is staff
+            // Check if user is staff or admin
             var userRole = HttpContext.Session.GetInt32("AccountRole");
-            if (userRole != 1)
+            if (userRole != 1 && userRole != 3)
             {
                 return RedirectToPage("/Home/Index");
             }
@@ -44,11 +44,11 @@ namespace HuynhNgocTien_SE18B01_A02.Pages.NewsArticle
 
         public async Task<IActionResult> OnPostAsync()
         {
-            // Check if user is staff
+            // Check if user is staff or admin
             var userRole = HttpContext.Session.GetInt32("AccountRole");
             var userId = HttpContext.Session.GetInt32("AccountId");
-            
-            if (userRole != 1 || !userId.HasValue)
+
+            if ((userRole != 1 && userRole != 3) || !userId.HasValue)
             {
                 return RedirectToPage("/Home/Index");
             }
@@ -62,8 +62,22 @@ namespace HuynhNgocTien_SE18B01_A02.Pages.NewsArticle
 
             // Generate new ID
             var allArticles = await _newsService.GetAllAsync();
-            var maxId = allArticles.Any() ? 
-                allArticles.Max(a => int.Parse(a.NewsArticleId.Substring(2))) : 0;
+            var maxId = 0;
+            if (allArticles.Any())
+            {
+                foreach (var existingArticle in allArticles)
+                {
+                    if (!string.IsNullOrEmpty(existingArticle.NewsArticleId) &&
+                        existingArticle.NewsArticleId.Length > 2 &&
+                        existingArticle.NewsArticleId.StartsWith("NA"))
+                    {
+                        if (int.TryParse(existingArticle.NewsArticleId.Substring(2), out int id))
+                        {
+                            maxId = Math.Max(maxId, id);
+                        }
+                    }
+                }
+            }
             var newId = $"NA{maxId + 1:D3}";
 
             var article = new Models.NewsArticle
@@ -74,7 +88,7 @@ namespace HuynhNgocTien_SE18B01_A02.Pages.NewsArticle
                 NewsContent = ArticleData.NewsContent,
                 NewsSource = ArticleData.NewsSource,
                 CategoryId = ArticleData.CategoryId,
-                NewsStatus = ArticleData.NewsStatus,
+                NewsStatus = NewsStatus,
                 CreatedById = (short)userId.Value,
                 CreatedDate = DateTime.Now
             };

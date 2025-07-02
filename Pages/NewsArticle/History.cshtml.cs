@@ -29,16 +29,24 @@ namespace HuynhNgocTien_SE18B01_A02.Pages.NewsArticle
             UserRole = HttpContext.Session.GetInt32("AccountRole") ?? 0;
             UserId = accountId.Value;
 
-            // Only Staff can view their own history
-            if (UserRole != 1)
+            // Only Staff and Admin can view history
+            if (UserRole != 1 && UserRole != 3)
             {
                 return RedirectToPage("/Home/Index");
             }
 
             var allArticles = await _newsService.GetAllAsync();
-            Articles = allArticles
-                .Where(a => a.CreatedById == UserId)
-                .OrderByDescending(a => a.ModifiedDate ?? a.CreatedDate);
+
+            if (UserRole == 1) // Staff - only their own articles
+            {
+                Articles = allArticles.Where(a => a.CreatedById == UserId);
+            }
+            else if (UserRole == 3) // Admin - all articles
+            {
+                Articles = allArticles;
+            }
+
+            Articles = Articles.OrderByDescending(a => a.ModifiedDate ?? a.CreatedDate);
 
             return Page();
         }

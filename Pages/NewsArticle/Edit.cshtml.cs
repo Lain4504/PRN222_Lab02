@@ -44,7 +44,7 @@ namespace HuynhNgocTien_SE18B01_A02.Pages.NewsArticle
         [BindProperty]
         public bool IsActive { get; set; } = true;
         [BindProperty]
-        public bool? NewsStatus { get; set; }
+        public bool NewsStatus { get; set; }
         public DateTime? CreatedDate { get; set; }
         public DateTime? ModifiedDate { get; set; }
 
@@ -73,10 +73,20 @@ namespace HuynhNgocTien_SE18B01_A02.Pages.NewsArticle
             {
                 return RedirectToPage("./Index");
             }
+            // Admin (role 3) can edit all articles
+
+            // Parse NewsArticleId safely
+            short articleIdNumber = 0;
+            if (!string.IsNullOrEmpty(article.NewsArticleId) &&
+                article.NewsArticleId.Length > 2 &&
+                article.NewsArticleId.StartsWith("NA"))
+            {
+                short.TryParse(article.NewsArticleId.Substring(2), out articleIdNumber);
+            }
 
             ArticleData = new NewsArticleViewModel
             {
-                NewsArticleId = short.Parse(article.NewsArticleId.Substring(2)),
+                NewsArticleId = articleIdNumber,
                 NewsTitle = article.NewsTitle ?? "",
                 Headline = article.Headline ?? "",
                 NewsContent = article.NewsContent ?? "",
@@ -95,12 +105,19 @@ namespace HuynhNgocTien_SE18B01_A02.Pages.NewsArticle
             NewsContent = article.NewsContent ?? "";
             NewsSource = article.NewsSource;
             CategoryId = article.CategoryId ?? 0;
-            NewsStatus = article.NewsStatus;
+            NewsStatus = article.NewsStatus ?? false;
             CreatedDate = article.CreatedDate;
             ModifiedDate = article.ModifiedDate;
 
             await LoadCategories();
             await LoadTags();
+
+            // Initialize SelectedTagIds if null
+            if (SelectedTagIds == null)
+            {
+                SelectedTagIds = new List<int>();
+            }
+
             return Page();
         }
 
@@ -118,6 +135,13 @@ namespace HuynhNgocTien_SE18B01_A02.Pages.NewsArticle
             {
                 await LoadCategories();
                 await LoadTags();
+
+                // Initialize SelectedTagIds if null
+                if (SelectedTagIds == null)
+                {
+                    SelectedTagIds = new List<int>();
+                }
+
                 return Page();
             }
 
@@ -128,14 +152,15 @@ namespace HuynhNgocTien_SE18B01_A02.Pages.NewsArticle
             }
 
             // Check permissions
-            if (userRole == 1 && article.CreatedById != userId)
+            if (userRole == 1 && article.CreatedById != userId) // Staff can only edit their own
             {
                 return RedirectToPage("./Index");
             }
-            else if (userRole != 1 && userRole != 3)
+            else if (userRole != 1 && userRole != 3) // Only Staff and Admin can edit
             {
                 return RedirectToPage("./Index");
             }
+            // Admin (role 3) can edit all articles
 
             // Update from direct properties
             article.NewsTitle = NewsTitle;
@@ -160,9 +185,25 @@ namespace HuynhNgocTien_SE18B01_A02.Pages.NewsArticle
 
         private async Task LoadCategories()
         {
-            var categories = await _categoryService.GetActiveAsync();
-            Categories = new SelectList(categories, "CategoryId", "CategoryName");
-            AvailableCategories = new SelectList(categories, "CategoryId", "CategoryName");
+            try
+            {
+                var categories = await _categoryService.GetActiveAsync();
+                if (categories != null)
+                {
+                    Categories = new SelectList(categories, "CategoryId", "CategoryName");
+                    AvailableCategories = new SelectList(categories, "CategoryId", "CategoryName");
+                }
+                else
+                {
+                    Categories = new SelectList(new List<Models.Category>(), "CategoryId", "CategoryName");
+                    AvailableCategories = new SelectList(new List<Models.Category>(), "CategoryId", "CategoryName");
+                }
+            }
+            catch
+            {
+                Categories = new SelectList(new List<Models.Category>(), "CategoryId", "CategoryName");
+                AvailableCategories = new SelectList(new List<Models.Category>(), "CategoryId", "CategoryName");
+            }
         }
 
         private async Task LoadTags()

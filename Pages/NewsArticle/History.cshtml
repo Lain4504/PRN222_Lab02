@@ -2,27 +2,27 @@
 @model HuynhNgocTien_SE18B01_A02.Pages.NewsArticle.HistoryModel
 
 @{
-    ViewData["Title"] = "My News History";
+    ViewData["Title"] = Model.UserRole == 3 ? "All News History" : "My News History";
 }
 
 <div class="card shadow">
     <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">My News History</h5>
-        <a asp-action="Index" class="btn btn-outline-secondary">
+        <h5 class="mb-0">@(Model.UserRole == 3 ? "All News History" : "My News History")</h5>
+        <a asp-page="./Index" class="btn btn-outline-secondary">
             <i class="bi bi-arrow-left"></i> Back to List
         </a>
     </div>
     <div class="card-body">
         <div class="row mb-3">
             <div class="col-md-6">
-                <form asp-action="History" method="get" class="d-flex gap-2">
+                <form asp-page="./History" method="get" class="d-flex gap-2">
                     <input type="text" name="searchString" class="form-control" placeholder="Search by title..." value="@ViewBag.CurrentFilter" />
                     <button type="submit" class="btn btn-outline-primary">
                         <i class="bi bi-search"></i> Search
                     </button>
                     @if (!string.IsNullOrEmpty(ViewBag.CurrentFilter))
                     {
-                        <a asp-action="History" class="btn btn-outline-secondary">Clear</a>
+                        <a asp-page="./History" class="btn btn-outline-secondary">Clear</a>
                     }
                 </form>
             </div>
@@ -39,6 +39,10 @@
                             <th>Status</th>
                             <th>Created Date</th>
                             <th>Modified Date</th>
+                            @if (Model.UserRole == 3)
+                            {
+                                <th>Created By</th>
+                            }
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -60,17 +64,21 @@
                                 </td>
                                 <td>@item.CreatedDate?.ToString("MM/dd/yyyy HH:mm")</td>
                                 <td>@item.ModifiedDate?.ToString("MM/dd/yyyy HH:mm")</td>
+                                @if (Model.UserRole == 3)
+                                {
+                                    <td>@item.CreatedBy?.AccountName</td>
+                                }
                                 <td>
                                     <div class="btn-group">
-                                        <a asp-action="Details" asp-route-id="@item.NewsArticleId" 
+                                        <a asp-page="./Details" asp-route-id="@item.NewsArticleId"
                                            class="btn btn-sm btn-outline-primary">
                                             <i class="bi bi-eye"></i>
                                         </a>
-                                        <a asp-action="Edit" asp-route-id="@item.NewsArticleId" 
+                                        <a asp-page="./Edit" asp-route-id="@item.NewsArticleId"
                                            class="btn btn-sm btn-outline-warning">
                                             <i class="bi bi-pencil"></i>
                                         </a>
-                                        <button type="button" class="btn btn-sm btn-outline-danger" 
+                                        <button type="button" class="btn btn-sm btn-outline-danger"
                                                 onclick="confirmDelete('@item.NewsArticleId')">
                                             <i class="bi bi-trash"></i>
                                         </button>

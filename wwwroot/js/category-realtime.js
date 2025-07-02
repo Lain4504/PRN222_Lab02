@@ -183,10 +183,15 @@ class CategoryRealTime {
             <td>${category.categoryDesciption}</td>
             <td>${category.parentCategoryName || 'None'}</td>
             <td class="status-cell">${statusBadge}</td>
-            <td>${category.newsArticleCount || 0}</td>
             <td>
-                <a href="/Category/Edit?id=${category.categoryId}" class="btn btn-sm btn-warning">Edit</a>
-                <button class="btn btn-sm btn-danger" onclick="deleteCategory(${category.categoryId})">Delete</button>
+                <div class="btn-group">
+                    <a href="/Category/Edit?id=${category.categoryId}" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-pencil"></i>
+                    </a>
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteCategory(${category.categoryId})">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
             </td>
         `;
         
