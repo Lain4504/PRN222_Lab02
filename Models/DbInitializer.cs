@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+
 namespace HuynhNgocTien_SE18B01_A02.Models;
 
 public class DbInitializer

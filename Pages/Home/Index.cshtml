@@ -1,5 +1,6 @@
 ﻿@page
 @model HuynhNgocTien_SE18B01_A02.Pages.Home.IndexModel
+@using HuynhNgocTien_SE18B01_A02.ViewModels
 
 @{
     ViewData["Title"] = "Home";
@@ -53,12 +54,12 @@
                 <h5 class="card-title mb-0">Categories</h5>
             </div>
             <div class="card-body">
-                @if (ViewBag.CategoryStats != null && ViewBag.CategoryStats.Count > 0)
+                @if (ViewData["CategoryStats"] != null && ((List<CategoryStatsViewModel>)ViewData["CategoryStats"]).Count > 0)
                 {
                     <div class="list-group">
-                        @foreach (var stat in ViewBag.CategoryStats)
+                        @foreach (var stat in (List<CategoryStatsViewModel>)ViewData["CategoryStats"])
                         {
-                            <div class="list-group-item">
+                            <div class="list-group-item" data-category-id="@stat.Category.CategoryId">
                                 <div class="d-flex w-100 justify-content-between">
                                     <h6 class="mb-1">@stat.Category.CategoryName</h6>
                                     <span class="badge bg-primary rounded-pill">@stat.ArticleCount</span>
@@ -96,3 +97,10 @@
         }
     </div>
 </div>
+
+@section Scripts {
+    @if (HttpContext.Session.GetInt32("AccountId").HasValue)
+    {
+        <script src="~/js/home-realtime.js" asp-append-version="true"></script>
+    }
+}

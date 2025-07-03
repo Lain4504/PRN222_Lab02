@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using HuynhNgocTien_SE18B01_A02.Services;
 using HuynhNgocTien_SE18B01_A02.Models;
+using HuynhNgocTien_SE18B01_A02.ViewModels;
 
 namespace HuynhNgocTien_SE18B01_A02.Pages.Home
 {
@@ -43,11 +44,34 @@ namespace HuynhNgocTien_SE18B01_A02.Pages.Home
             // Get categories
             Categories = await _categoryService.GetAllAsync();
 
+            // Create category statistics for ViewBag
+            var categoryStats = Categories.Select(c => new CategoryStatsViewModel
+            {
+                Category = c,
+                ArticleCount = allArticles.Count(a => a.CategoryId == c.CategoryId && a.NewsStatus == true)
+            }).Where(cs => cs.Category.IsActive == true).OrderByDescending(cs => cs.ArticleCount).ToList();
+
+            ViewData["CategoryStats"] = categoryStats;
+
             // Get statistics
             TotalArticles = allArticles.Count();
             TotalCategories = Categories.Count();
 
             return Page();
+        }
+
+        public async Task<IActionResult> OnGetCategoryStatsAsync()
+        {
+            var allArticles = await _newsService.GetAllAsync();
+            var categories = await _categoryService.GetAllAsync();
+
+            var categoryStats = categories.Select(c => new CategoryStatsViewModel
+            {
+                Category = c,
+                ArticleCount = allArticles.Count(a => a.CategoryId == c.CategoryId && a.NewsStatus == true)
+            }).Where(cs => cs.Category.IsActive == true).OrderByDescending(cs => cs.ArticleCount).ToList();
+
+            return new JsonResult(categoryStats);
         }
     }
 }

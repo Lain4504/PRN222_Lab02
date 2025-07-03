@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using HuynhNgocTien_SE18B01_A02.Models;
 
 namespace HuynhNgocTien_SE18B01_A02.ViewModels
 {
@@ -19,5 +20,11 @@ namespace HuynhNgocTien_SE18B01_A02.ViewModels
 
         [Display(Name = "Is Active")]
         public bool IsActive { get; set; } = true;
+    }
+
+    public class CategoryStatsViewModel
+    {
+        public Category Category { get; set; } = null!;
+        public int ArticleCount { get; set; }
     }
 }
