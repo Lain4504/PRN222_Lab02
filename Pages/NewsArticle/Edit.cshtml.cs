@@ -92,7 +92,7 @@ namespace HuynhNgocTien_SE18B01_A02.Pages.NewsArticle
                 NewsContent = article.NewsContent ?? "",
                 NewsSource = article.NewsSource,
                 CategoryId = article.CategoryId ?? 0,
-                NewsStatus = article.NewsStatus,
+                NewsStatus = article.NewsStatus ?? false,
                 CreatedDate = article.CreatedDate,
                 ModifiedDate = article.ModifiedDate,
                 CreatedById = article.CreatedById

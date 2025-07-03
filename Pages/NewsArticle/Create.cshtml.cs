@@ -24,10 +24,6 @@ namespace HuynhNgocTien_SE18B01_A02.Pages.NewsArticle
         public SelectList Categories { get; set; } = new SelectList(new List<Models.Category>(), "CategoryId", "CategoryName");
         public IEnumerable<Models.Tag> AvailableTags { get; set; } = new List<Models.Tag>();
 
-        // Properties that the view expects directly on the model
-        [BindProperty]
-        public bool NewsStatus { get; set; } = true;
-
         public async Task<IActionResult> OnGetAsync()
         {
             // Check if user is staff or admin
@@ -88,7 +84,7 @@ namespace HuynhNgocTien_SE18B01_A02.Pages.NewsArticle
                 NewsContent = ArticleData.NewsContent,
                 NewsSource = ArticleData.NewsSource,
                 CategoryId = ArticleData.CategoryId,
-                NewsStatus = NewsStatus,
+                NewsStatus = ArticleData.NewsStatus,
                 CreatedById = (short)userId.Value,
                 CreatedDate = DateTime.Now
             };

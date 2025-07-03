@@ -28,7 +28,7 @@ namespace HuynhNgocTien_SE18B01_A02.ViewModels
         public string? Tags { get; set; }
 
         [Display(Name = "News Status")]
-        public bool? NewsStatus { get; set; } = true;
+        public bool NewsStatus { get; set; } = true;
 
         public DateTime? CreatedDate { get; set; }
         public DateTime? ModifiedDate { get; set; }
