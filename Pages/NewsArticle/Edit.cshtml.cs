@@ -24,27 +24,10 @@ namespace HuynhNgocTien_SE18B01_A02.Pages.NewsArticle
         public SelectList Categories { get; set; } = new SelectList(new List<Models.Category>(), "CategoryId", "CategoryName");
         public SelectList AvailableCategories { get; set; } = new SelectList(new List<Models.Category>(), "CategoryId", "CategoryName");
         public IEnumerable<Models.Tag> AvailableTags { get; set; } = new List<Models.Tag>();
+
+        [BindProperty]
         public List<int> SelectedTagIds { get; set; } = new List<int>();
 
-        // Properties that the view expects directly on the model
-        [BindProperty]
-        public string NewsArticleId { get; set; } = string.Empty;
-        [BindProperty]
-        public string NewsTitle { get; set; } = string.Empty;
-        [BindProperty]
-        public string? Headline { get; set; }
-        [BindProperty]
-        public string NewsContent { get; set; } = string.Empty;
-        [BindProperty]
-        public string? NewsSource { get; set; }
-        [BindProperty]
-        public short CategoryId { get; set; }
-        [BindProperty]
-        public short? ParentCategoryId { get; set; }
-        [BindProperty]
-        public bool IsActive { get; set; } = true;
-        [BindProperty]
-        public bool NewsStatus { get; set; }
         public DateTime? CreatedDate { get; set; }
         public DateTime? ModifiedDate { get; set; }
 
@@ -98,25 +81,14 @@ namespace HuynhNgocTien_SE18B01_A02.Pages.NewsArticle
                 CreatedById = article.CreatedById
             };
 
-            // Populate direct properties for the view
-            NewsArticleId = article.NewsArticleId;
-            NewsTitle = article.NewsTitle ?? "";
-            Headline = article.Headline;
-            NewsContent = article.NewsContent ?? "";
-            NewsSource = article.NewsSource;
-            CategoryId = article.CategoryId ?? 0;
-            NewsStatus = article.NewsStatus ?? false;
             CreatedDate = article.CreatedDate;
             ModifiedDate = article.ModifiedDate;
 
+            // Load selected tags for this article
+            SelectedTagIds = article.Tags?.Select(t => t.TagId).ToList() ?? new List<int>();
+
             await LoadCategories();
             await LoadTags();
-
-            // Initialize SelectedTagIds if null
-            if (SelectedTagIds == null)
-            {
-                SelectedTagIds = new List<int>();
-            }
 
             return Page();
         }
@@ -125,7 +97,11 @@ namespace HuynhNgocTien_SE18B01_A02.Pages.NewsArticle
         {
             var userRole = HttpContext.Session.GetInt32("AccountRole");
             var userId = HttpContext.Session.GetInt32("AccountId");
-            
+
+            // Debug: Log received data
+            Console.WriteLine($"Edit OnPostAsync - SelectedTagIds count: {SelectedTagIds?.Count ?? 0}");
+            Console.WriteLine($"Edit OnPostAsync - SelectedTagIds: [{string.Join(", ", SelectedTagIds ?? new List<int>())}]");
+
             if (!userId.HasValue)
             {
                 return RedirectToPage("/Account/Login");
@@ -162,25 +138,25 @@ namespace HuynhNgocTien_SE18B01_A02.Pages.NewsArticle
             }
             // Admin (role 3) can edit all articles
 
-            // Update from direct properties
-            article.NewsTitle = NewsTitle;
-            article.Headline = Headline;
-            article.NewsContent = NewsContent;
-            article.NewsSource = NewsSource;
-            article.CategoryId = CategoryId;
-            article.NewsStatus = NewsStatus;
+            // Update from ArticleData ViewModel
+            article.NewsTitle = ArticleData.NewsTitle;
+            article.Headline = ArticleData.Headline;
+            article.NewsContent = ArticleData.NewsContent;
+            article.NewsSource = ArticleData.NewsSource;
+            article.CategoryId = ArticleData.CategoryId;
+            article.NewsStatus = ArticleData.NewsStatus;
             article.ModifiedDate = DateTime.Now;
             article.UpdatedById = (short)userId.Value;
 
-            var tagIds = new List<int>();
-            if (!string.IsNullOrEmpty(ArticleData.Tags))
-            {
-                // Parse tags - implement later if needed
-            }
+            // Use selected tag IDs from the form
+            var tagIds = SelectedTagIds ?? new List<int>();
+
+            // Debug: Log selected tag IDs
+            Console.WriteLine($"Selected Tag IDs: {string.Join(", ", tagIds)}");
 
             await _newsService.UpdateAsync(article, tagIds);
             TempData["Success"] = "Article updated successfully!";
-            return RedirectToPage("./Details", new { id = id });
+            return RedirectToPage("./Index");
         }
 
         private async Task LoadCategories()

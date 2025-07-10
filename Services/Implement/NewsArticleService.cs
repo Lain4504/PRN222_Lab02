@@ -65,13 +65,15 @@ public class NewsArticleService : INewsArticleService
         // Set creation date
         article.CreatedDate = DateTime.Now;
 
-        // Create article
-        var createdArticle = await _newsRepository.AddAsync(article);
+        // Add tags before creating
+        if (tagIds.Any())
+        {
+            var tags = await _tagRepository.GetAllAsync();
+            article.Tags = tags.Where(t => tagIds.Contains(t.TagId)).ToList();
+        }
 
-        // Add tags
-        var tags = await _tagRepository.GetAllAsync();
-        createdArticle.Tags = tags.Where(t => tagIds.Contains(t.TagId)).ToList();
-        await _newsRepository.UpdateAsync(createdArticle);
+        // Create article with tags
+        var createdArticle = await _newsRepository.AddAsync(article);
 
         // Send SignalR notification
         try
@@ -109,14 +111,29 @@ public class NewsArticleService : INewsArticleService
             }
         }
 
-        // Update article
-        article.ModifiedDate = DateTime.Now;
-        var updatedArticle = await _newsRepository.UpdateAsync(article);
+        // Update article properties
+        existingArticle.NewsTitle = article.NewsTitle;
+        existingArticle.Headline = article.Headline;
+        existingArticle.NewsContent = article.NewsContent;
+        existingArticle.NewsSource = article.NewsSource;
+        existingArticle.CategoryId = article.CategoryId;
+        existingArticle.NewsStatus = article.NewsStatus;
+        existingArticle.ModifiedDate = DateTime.Now;
+        existingArticle.UpdatedById = article.UpdatedById;
 
         // Update tags
-        var tags = await _tagRepository.GetAllAsync();
-        updatedArticle.Tags = tags.Where(t => tagIds.Contains(t.TagId)).ToList();
-        var finalUpdatedArticle = await _newsRepository.UpdateAsync(updatedArticle);
+        existingArticle.Tags.Clear();
+        if (tagIds.Any())
+        {
+            var selectedTags = await _tagRepository.GetAllAsync();
+            var tagsToAdd = selectedTags.Where(t => tagIds.Contains(t.TagId)).ToList();
+            foreach (var tag in tagsToAdd)
+            {
+                existingArticle.Tags.Add(tag);
+            }
+        }
+
+        var finalUpdatedArticle = await _newsRepository.UpdateAsync(existingArticle);
 
         // Send SignalR notification
         try

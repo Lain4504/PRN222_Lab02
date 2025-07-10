@@ -24,6 +24,9 @@ namespace HuynhNgocTien_SE18B01_A02.Pages.NewsArticle
         public SelectList Categories { get; set; } = new SelectList(new List<Models.Category>(), "CategoryId", "CategoryName");
         public IEnumerable<Models.Tag> AvailableTags { get; set; } = new List<Models.Tag>();
 
+        [BindProperty]
+        public List<int> SelectedTagIds { get; set; } = new List<int>();
+
         public async Task<IActionResult> OnGetAsync()
         {
             // Check if user is staff or admin
@@ -89,14 +92,8 @@ namespace HuynhNgocTien_SE18B01_A02.Pages.NewsArticle
                 CreatedDate = DateTime.Now
             };
 
-            // Parse tags if provided
-            var tagIds = new List<int>();
-            if (!string.IsNullOrEmpty(ArticleData.Tags))
-            {
-                var tagNames = ArticleData.Tags.Split(',', StringSplitOptions.RemoveEmptyEntries)
-                    .Select(t => t.Trim()).ToList();
-                // For now, we'll skip tag processing - you can implement this later
-            }
+            // Use selected tag IDs from the form
+            var tagIds = SelectedTagIds ?? new List<int>();
 
             await _newsService.CreateAsync(article, tagIds);
             TempData["Success"] = "Article created successfully!";
