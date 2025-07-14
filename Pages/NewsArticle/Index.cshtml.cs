@@ -32,17 +32,17 @@ namespace HuynhNgocTien_SE18B01_A02.Pages.NewsArticle
             var allArticles = await _newsService.GetAllAsync();
 
             // Filter articles based on user role
-            if (UserRole == 1) // Staff - only their own articles
+            if (UserRole == 1) // Staff - can see all articles
             {
-                Articles = allArticles.Where(a => a.CreatedById == UserId);
+                Articles = allArticles;
             }
             else if (UserRole == 2) // Lecturer - only published articles
             {
                 Articles = allArticles.Where(a => a.NewsStatus == true);
             }
-            else if (UserRole == 3) // Admin - all articles
+            else if (UserRole == 3) // Admin - only published articles (no CRUD access)
             {
-                Articles = allArticles;
+                Articles = allArticles.Where(a => a.NewsStatus == true);
             }
             else
             {
@@ -69,8 +69,8 @@ namespace HuynhNgocTien_SE18B01_A02.Pages.NewsArticle
                 return NotFound();
             }
 
-            // Check permissions
-            if (userRole == 3 || (userRole == 1 && article.CreatedById == userId))
+            // Check permissions - only staff can delete all articles
+            if (userRole == 1)
             {
                 await _newsService.DeleteAsync(id);
                 TempData["Success"] = "Article deleted successfully!";

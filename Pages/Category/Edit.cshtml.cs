@@ -23,9 +23,9 @@ namespace HuynhNgocTien_SE18B01_A02.Pages.Category
 
         public async Task<IActionResult> OnGetAsync(short id)
         {
-            // Check if user is admin
+            // Check if user is staff
             var userRole = HttpContext.Session.GetInt32("AccountRole");
-            if (userRole != 3)
+            if (userRole != 1)
             {
                 return RedirectToPage("/Home/Index");
             }
@@ -51,9 +51,9 @@ namespace HuynhNgocTien_SE18B01_A02.Pages.Category
 
         public async Task<IActionResult> OnPostAsync()
         {
-            // Check if user is admin
+            // Check if user is staff
             var userRole = HttpContext.Session.GetInt32("AccountRole");
-            if (userRole != 3)
+            if (userRole != 1)
             {
                 return RedirectToPage("/Home/Index");
             }

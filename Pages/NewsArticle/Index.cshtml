@@ -8,7 +8,7 @@
 <div class="card shadow">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0">News Articles</h5>
-        @if (Model.UserRole == 1 || Model.UserRole == 3) // Staff or Admin
+        @if (Model.UserRole == 1) // Staff only
         {
             <a asp-page="./Create" class="btn btn-primary">
                 <i class="bi bi-plus-circle"></i> Create New
@@ -16,28 +16,16 @@
         }
     </div>
     <div class="card-body">
-        <div class="row mb-3">
-            <div class="col-md-6">
-                <form asp-action="Index" method="get" class="d-flex gap-2">
-                    <input type="text" name="searchString" class="form-control" placeholder="Search by title..." value="@ViewBag.CurrentFilter" />
-                    <button type="submit" class="btn btn-outline-primary">
-                        <i class="bi bi-search"></i> Search
-                    </button>
-                    @if (!string.IsNullOrEmpty(ViewBag.CurrentFilter))
-                    {
-                        <a asp-action="Index" class="btn btn-outline-secondary">Clear</a>
-                    }
-                </form>
-            </div>
-            @if (Model.UserRole == 1 || Model.UserRole == 3) // Staff or Admin
-            {
-                <div class="col-md-6 text-end">
+        @if (Model.UserRole == 1) // Staff only
+        {
+            <div class="row mb-3">
+                <div class="col-md-12 text-end">
                     <a asp-page="./History" class="btn btn-outline-info">
-                        <i class="bi bi-clock-history"></i> @(Model.UserRole == 3 ? "All News History" : "My News History")
+                        <i class="bi bi-clock-history"></i> My News History
                     </a>
                 </div>
-            }
-        </div>
+            </div>
+        }
 
         @if (Model.Articles.Any())
         {
@@ -77,7 +65,7 @@
                                            class="btn btn-sm btn-outline-primary">
                                             <i class="bi bi-eye"></i>
                                         </a>
-                                        @if ((Model.UserRole == 1 && item.CreatedById == Model.UserId) || Model.UserRole == 3)
+                                        @if (Model.UserRole == 1)
                                         {
                                             <a asp-page="./Edit" asp-route-id="@item.NewsArticleId"
                                                class="btn btn-sm btn-outline-warning">

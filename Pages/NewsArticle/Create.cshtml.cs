@@ -29,9 +29,9 @@ namespace HuynhNgocTien_SE18B01_A02.Pages.NewsArticle
 
         public async Task<IActionResult> OnGetAsync()
         {
-            // Check if user is staff or admin
+            // Check if user is staff only
             var userRole = HttpContext.Session.GetInt32("AccountRole");
-            if (userRole != 1 && userRole != 3)
+            if (userRole != 1)
             {
                 return RedirectToPage("/Home/Index");
             }
@@ -43,11 +43,11 @@ namespace HuynhNgocTien_SE18B01_A02.Pages.NewsArticle
 
         public async Task<IActionResult> OnPostAsync()
         {
-            // Check if user is staff or admin
+            // Check if user is staff only
             var userRole = HttpContext.Session.GetInt32("AccountRole");
             var userId = HttpContext.Session.GetInt32("AccountId");
 
-            if ((userRole != 1 && userRole != 3) || !userId.HasValue)
+            if (userRole != 1 || !userId.HasValue)
             {
                 return RedirectToPage("/Home/Index");
             }

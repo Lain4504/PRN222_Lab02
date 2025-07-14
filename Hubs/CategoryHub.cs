@@ -7,7 +7,7 @@ namespace HuynhNgocTien_SE18B01_A02.Hubs
     {
         public async Task JoinCategoryGroup()
         {
-            if (IsUserAuthenticated() && IsAdmin())
+            if (IsUserAuthenticated() && (IsStaff() || IsAdmin()))
             {
                 await Groups.AddToGroupAsync(Context.ConnectionId, "Categories");
             }

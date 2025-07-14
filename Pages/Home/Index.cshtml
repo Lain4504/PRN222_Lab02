@@ -76,7 +76,7 @@
             </div>
         </div>
 
-        @if (Model.UserRole == 1 || Model.UserRole == 3)
+        @if (Model.UserRole == 1)
         {
             <div class="card shadow">
                 <div class="card-body">
@@ -85,12 +85,9 @@
                         <a asp-page="/NewsArticle/Create" class="btn btn-primary">
                             <i class="bi bi-plus-circle"></i> Create New Article
                         </a>
-                        @if (Model.UserRole == 3)
-                        {
-                            <a asp-page="/Category/Create" class="btn btn-outline-primary">
-                                <i class="bi bi-folder-plus"></i> Create New Category
-                            </a>
-                        }
+                        <a asp-page="/Category/Create" class="btn btn-outline-primary">
+                            <i class="bi bi-folder-plus"></i> Create New Category
+                        </a>
                     </div>
                 </div>
             </div>

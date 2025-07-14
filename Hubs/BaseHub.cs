@@ -29,7 +29,7 @@ namespace HuynhNgocTien_SE18B01_A02.Hubs
         protected bool IsStaff()
         {
             var role = GetCurrentUserRole();
-            return role.HasValue && (role.Value == 2 || role.Value == 3);
+            return role.HasValue && role.Value == 1;
         }
 
         public override async Task OnConnectedAsync()

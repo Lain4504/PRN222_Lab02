@@ -15,17 +15,19 @@ namespace HuynhNgocTien_SE18B01_A02.Pages.Category
         }
 
         public IEnumerable<Models.Category> Categories { get; set; } = new List<Models.Category>();
+        public int UserRole { get; set; }
 
         public async Task<IActionResult> OnGetAsync()
         {
-            // Check if user has permission (Admin or Staff)
+            // Check if user has permission (Staff and Admin can view)
             var userRole = HttpContext.Session.GetInt32("AccountRole");
 
-            if (userRole != 3 && userRole != 1)
+            if (userRole != 1 && userRole != 3)
             {
                 return RedirectToPage("/Home/Index");
             }
 
+            UserRole = userRole ?? 0;
             Categories = await _categoryService.GetAllAsync();
             return Page();
         }
@@ -34,13 +36,13 @@ namespace HuynhNgocTien_SE18B01_A02.Pages.Category
         {
             Console.WriteLine($"Delete Category called with ID: {id}");
 
-            // Check if user is admin
+            // Check if user is staff
             var userRole = HttpContext.Session.GetInt32("AccountRole");
             Console.WriteLine($"User role: {userRole}");
 
-            if (userRole != 3)
+            if (userRole != 1)
             {
-                Console.WriteLine("Access denied - not admin");
+                Console.WriteLine("Access denied - not staff");
                 return RedirectToPage("/Home/Index");
             }
 

@@ -29,7 +29,7 @@
                             <li class="nav-item">
                                 <a class="nav-link" asp-page="/NewsArticle/Index">News Articles</a>
                             </li>
-                            @if (Context.Session.GetInt32("AccountRole") == 3 || Context.Session.GetInt32("AccountRole") == 1)
+                            @if (Context.Session.GetInt32("AccountRole") == 1 || Context.Session.GetInt32("AccountRole") == 3)
                             {
                                 <li class="nav-item">
                                     <a class="nav-link" asp-page="/Category/Index">Categories</a>

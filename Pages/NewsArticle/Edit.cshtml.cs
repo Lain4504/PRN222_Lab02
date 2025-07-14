@@ -47,12 +47,8 @@ namespace HuynhNgocTien_SE18B01_A02.Pages.NewsArticle
                 return NotFound();
             }
 
-            // Check permissions
-            if (userRole == 1 && article.CreatedById != userId) // Staff can only edit their own
-            {
-                return RedirectToPage("./Index");
-            }
-            else if (userRole != 1 && userRole != 3) // Only Staff and Admin can edit
+            // Check permissions - only staff can edit all articles
+            if (userRole != 1)
             {
                 return RedirectToPage("./Index");
             }
@@ -127,12 +123,8 @@ namespace HuynhNgocTien_SE18B01_A02.Pages.NewsArticle
                 return NotFound();
             }
 
-            // Check permissions
-            if (userRole == 1 && article.CreatedById != userId) // Staff can only edit their own
-            {
-                return RedirectToPage("./Index");
-            }
-            else if (userRole != 1 && userRole != 3) // Only Staff and Admin can edit
+            // Check permissions - only staff can edit all articles
+            if (userRole != 1)
             {
                 return RedirectToPage("./Index");
             }
